@@ -1142,6 +1142,136 @@
     }
   }
 
+  class Card extends DivComponent {
+    constructor(appState, cardState) {
+      super();
+      this.appState = appState;
+      this.cardState = cardState;
+    }
+
+    render() {
+      this.el.classList.add("card");
+      const existInFavorites = this.appState.favorites.find(
+        (book) => book.key == this.cardState.key
+      );
+      this.el.innerHTML = `
+    <div class="card">
+      <div class="card__image">
+        <img
+          src="https://covers.openlibrary.org/b/olid/${
+            this.cardState.cover_edition_key
+          }-M.jpg"
+          alt="Обложка"
+        />
+      </div>
+      <div class="card__content">
+        <span class="card__content-genre">${
+          this.cardState.subject ? this.cardState.subject[0] : "Не задано"
+        }</span>
+        <h3 class="card__content-title">${this.cardState.title}</h3>
+        <h4 class="card__content-author">${
+          this.cardState.author_name ? this.cardState.author_name.join(", ") : "Не задано"
+        }</h4>
+        <div class="card__footer">
+          <button class="card__button-favorite ${
+            existInFavorites ? "button__active" : ""
+          }" aria-label="В избранное">
+            <img src="${
+              existInFavorites ? "static/favorites.svg" : "static/favorite-white.svg"
+            }" alt="Иконка избранного" />
+          </button>
+        </div>
+      </div>
+    </div>`;
+      if (existInFavorites) {
+        this.el
+          .querySelector("button")
+          .addEventListener("click", this.#deleteFromFavorites.bind(this));
+      } else {
+        this.el
+          .querySelector("button")
+          .addEventListener("click", this.#addToFavorites.bind(this));
+      }
+
+      return this.el;
+    }
+
+    #deleteFromFavorites() {
+      this.appState.favorites = this.appState.favorites.filter(
+        (book) => book.key !== this.cardState.key
+      );
+    }
+    #addToFavorites() {
+      this.appState.favorites.push(this.cardState);
+    }
+  }
+
+  class CardList extends DivComponent {
+    constructor(appState, state) {
+      super();
+      this.appState = appState;
+      this.state = state;
+    }
+
+    render() {
+      this.el.classList.add("main_content");
+      if (this.state.loading) {
+        this.el.innerHTML = `
+        <h3 class="card-loading">
+               загрузка...
+        </h3>
+    `;
+        return this.el;
+      }
+
+      const cartGrid = document.createElement("div");
+      cartGrid.classList.add("card_grid");
+      this.el.append(cartGrid);
+      for (const card of this.state.list) {
+        cartGrid.append(new Card(this.appState, card).render());
+      }
+
+      return this.el;
+    }
+  }
+
+  class FavoritesView extends AbtractView {
+    constructor(appState) {
+      super();
+      this.appState = appState;
+      this.appState = onChange(this.appState, this.appStateHook.bind(this));
+      this.setTitle("Мои книги");
+    }
+
+    destroy() {
+      onChange.unsubscribe(this.appState);
+    }
+
+    appStateHook(path) {
+      if (path === "favorites") {
+        this.render();
+      }
+    }
+
+    render() {
+      const main = document.createElement("div");
+      main.innerHTML = `
+    <h2 class="card-list__title">
+            Избранное
+    </h2>
+    `;
+      main.append(new CardList(this.appState, { list: this.appState.favorites }).render());
+      this.app.innerHTML = "";
+      this.app.append(main);
+      this.renderHeader();
+    }
+
+    renderHeader() {
+      const header = new Header(this.appState).render();
+      this.app.prepend(header);
+    }
+  }
+
   class Search extends DivComponent {
     constructor(state) {
       super();
@@ -1177,37 +1307,10 @@
     }
   }
 
-  class CardList extends DivComponent {
-    constructor(appState, state) {
-      super();
-      this.appState = appState;
-      this.state = state;
-    }
-
-    render() {
-      this.el.classList.add("card-list");
-      if (this.state.loading) {
-        this.el.innerHTML = `
-        <h2 class="card-list__title">
-               Найдено книг – загрузка...
-        </h2>
-    `;
-        return this.el;
-      }
-
-      this.el.innerHTML = `
-    <h2 class="card-list__title">
-            Найдено книг – ${this.state.list.length}
-    </h2>
-    `;
-
-      return this.el;
-    }
-  }
-
   class MainView extends AbtractView {
     state = {
       list: [],
+      numFound: 0,
       loading: false,
       searchQuery: undefined,
       offset: 0,
@@ -1215,20 +1318,26 @@
     constructor(appState) {
       super();
       this.appState = appState;
-      this.appState = onChange(this.appState, this.AppStateHook.bind(this));
+      this.appState = onChange(this.appState, this.appStateHook.bind(this));
       this.state = onChange(this.state, this.stateHook.bind(this));
       this.setTitle("Поиск книг");
     }
 
-    AppStateHook(path) {
+    destroy() {
+      onChange.unsubscribe(this.appState);
+      onChange.unsubscribe(this.state);
+    }
+
+    appStateHook(path) {
       if (path === "favorites") {
-        console.log(path);
+        this.render();
       }
     }
     async stateHook(path) {
       if (path === "searchQuery") {
         this.state.loading = true;
         const data = await this.loadList(this.state.searchQuery, this.state.offset);
+        this.state.numFound = data.numFound;
         this.state.loading = false;
         this.state.list = data.docs;
       }
@@ -1249,6 +1358,11 @@
 
     render() {
       const main = document.createElement("div");
+      main.innerHTML = `
+    <h2 class="card-list__title">
+            Найдено книг – ${this.state.numFound}
+    </h2>
+    `;
       main.append(new Search(this.state).render());
       main.append(new CardList(this.appState, this.state).render());
       this.app.innerHTML = "";
@@ -1263,7 +1377,10 @@
   }
 
   class App {
-    routes = [{ path: "", view: MainView }];
+    routes = [
+      { path: "", view: MainView },
+      { path: "#favorites", view: FavoritesView },
+    ];
 
     appState = {
       favorites: [],

@@ -1,4 +1,5 @@
 import { DivComponent } from "../../common/div-component";
+import { Card } from "../card/card";
 import "./card-list.css";
 
 export class CardList extends DivComponent {
@@ -9,21 +10,22 @@ export class CardList extends DivComponent {
   }
 
   render() {
-    this.el.classList.add("card-list");
+    this.el.classList.add("main_content");
     if (this.state.loading) {
       this.el.innerHTML = `
-        <h2 class="card-list__title">
-               Найдено книг – загрузка...
-        </h2>
+        <h3 class="card-loading">
+               загрузка...
+        </h3>
     `;
       return this.el;
     }
 
-    this.el.innerHTML = `
-    <h2 class="card-list__title">
-            Найдено книг – ${this.state.list.length}
-    </h2>
-    `;
+    const cartGrid = document.createElement("div");
+    cartGrid.classList.add("card_grid");
+    this.el.append(cartGrid);
+    for (const card of this.state.list) {
+      cartGrid.append(new Card(this.appState, card).render());
+    }
 
     return this.el;
   }

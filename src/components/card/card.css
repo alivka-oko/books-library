@@ -1,0 +1,78 @@
+.card {
+  min-height: 290px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+}
+
+.card__content {
+  color: var(--white);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card__content-genre {
+  font-weight: 300;
+  font-size: 11px;
+  line-height: 15px;
+  color: #dedede;
+}
+.card__image {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+  background: #b8b8b8;
+  height: 140px;
+  overflow-y: hidden;
+}
+.card__image img {
+  width: 60%;
+  object-position: top;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card__content-title {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 16px;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.card__content-author {
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 15px;
+  color: #ffffff;
+}
+.card__button-favorite {
+  background-color: var(--black);
+  border: 1px solid var(--white);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.button__active {
+  background-color: var(--white);
+}
+
+.card__footer {
+  margin-top: auto;
+}
+
+.card_grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
