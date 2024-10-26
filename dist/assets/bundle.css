@@ -38,3 +38,44 @@
   min-width: 24px;
   height: 24px;
 }
+
+.search {
+  display: flex;
+  gap: 23px;
+}
+.search__wrapper {
+  flex: 1;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: #dedede;
+  border-radius: 5px;
+  gap: 26px;
+  padding: 12px 8px;
+}
+
+.search__icon {
+  width: 24px;
+  height: 24px;
+}
+
+.search__input {
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+.search__input::placeholder {
+  color: #252525;
+}
+.search__input:focus {
+  outline: none;
+}
+
+.search__button {
+  width: 56px;
+  height: 56px;
+  background: var(--black);
+  border-radius: 5px;
+  cursor: pointer;
+}

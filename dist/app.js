@@ -1109,6 +1109,9 @@
     constructor() {
       this.el = document.createElement("div");
     }
+    render() {
+      this.el;
+    }
   }
 
   class Header extends DivComponent {
@@ -1118,7 +1121,6 @@
     }
 
     render() {
-      this.el.innerHTML = "";
       this.el.classList.add("header");
       this.el.innerHTML = `
         <div>
@@ -1135,6 +1137,30 @@
              <div class="menu__counter">${this.appState.favorites.length}</div>
             </a>
         </div>
+    `;
+      return this.el;
+    }
+  }
+
+  class Search extends DivComponent {
+    constructor(state) {
+      super();
+      this.state = state;
+    }
+
+    render() {
+      this.el.classList.add("search");
+      this.el.innerHTML = `
+        <div class="search__wrapper">
+            <img src="/static/search.svg" class="search__icon" alt="Иконка поиска"/>
+            <input type="text" placeholder = "Найти книгу или автора...."
+            class="search__input"  value="${
+              this.state.searchQuery ? this.state.searchQuery : ""
+            }"/>         
+        </div>
+        <button class="search__button">
+            <img src="/static/search-white.svg" aria-label="Искать" alt="Иконка поиска"/>       
+        </button>
     `;
       return this.el;
     }
@@ -1162,6 +1188,7 @@
 
     render() {
       const main = document.createElement("div");
+      main.append(new Search(this.state).render());
       this.app.innerHTML = "";
       this.app.append(main);
       this.renderHeader();
