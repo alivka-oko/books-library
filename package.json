@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Cool app",
   "main": "app.js",
+  "type": "module",
   "scripts": {
-    "start": "live-server",
-    "build": "rollup"
+    "live": "live-server",
+    "build": "rollup -c",
+    "start": "rollup -c --watch"
   },
   "repository": {
     "type": "git",
@@ -24,8 +26,10 @@
   "homepage": "https://github.com/alivka-oko/books-library#readme",
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
-    "rollup": "^4.24.0"
+    "rollup": "^4.24.0",
+    "rollup-plugin-import-css": "^3.5.6"
   }
 }
