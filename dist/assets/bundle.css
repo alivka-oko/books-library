@@ -79,3 +79,7 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+.card-list {
+  padding: 30px 0;
+}

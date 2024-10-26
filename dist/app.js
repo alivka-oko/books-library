@@ -1177,6 +1177,34 @@
     }
   }
 
+  class CardList extends DivComponent {
+    constructor(appState, state) {
+      super();
+      this.appState = appState;
+      this.state = state;
+    }
+
+    render() {
+      this.el.classList.add("card-list");
+      if (this.state.loading) {
+        this.el.innerHTML = `
+        <h2 class="card-list__title">
+               Найдено книг – загрузка...
+        </h2>
+    `;
+        return this.el;
+      }
+
+      this.el.innerHTML = `
+    <h2 class="card-list__title">
+            Найдено книг – ${this.state.list.length}
+    </h2>
+    `;
+
+      return this.el;
+    }
+  }
+
   class MainView extends AbtractView {
     state = {
       list: [],
@@ -1188,7 +1216,7 @@
       super();
       this.appState = appState;
       this.appState = onChange(this.appState, this.AppStateHook.bind(this));
-      this.state = onChange(this.appState, this.StateHook.bind(this));
+      this.state = onChange(this.state, this.stateHook.bind(this));
       this.setTitle("Поиск книг");
     }
 
@@ -1197,14 +1225,18 @@
         console.log(path);
       }
     }
-    async StateHook(path) {
+    async stateHook(path) {
       if (path === "searchQuery") {
         this.state.loading = true;
-        console.log("гружу");
         const data = await this.loadList(this.state.searchQuery, this.state.offset);
         this.state.loading = false;
-        this.state.list = data;
-        console.log(data);
+        this.state.list = data.docs;
+      }
+      if (path === "list") {
+        this.render();
+      }
+      if (path === "loading") {
+        this.render();
       }
     }
 
@@ -1218,6 +1250,7 @@
     render() {
       const main = document.createElement("div");
       main.append(new Search(this.state).render());
+      main.append(new CardList(this.appState, this.state).render());
       this.app.innerHTML = "";
       this.app.append(main);
       this.renderHeader();
