@@ -14,6 +14,7 @@ export class MainView extends AbtractView {
     super();
     this.appState = appState;
     this.appState = onChange(this.appState, this.AppStateHook.bind(this));
+    this.state = onChange(this.appState, this.StateHook.bind(this));
     this.setTitle("Поиск книг");
   }
 
@@ -21,6 +22,23 @@ export class MainView extends AbtractView {
     if (path === "favorites") {
       console.log(path);
     }
+  }
+  async StateHook(path) {
+    if (path === "searchQuery") {
+      this.state.loading = true;
+      console.log("гружу");
+      const data = await this.loadList(this.state.searchQuery, this.state.offset);
+      this.state.loading = false;
+      this.state.list = data;
+      console.log(data);
+    }
+  }
+
+  async loadList(q, offset) {
+    const res = await fetch(
+      `https://openlibrary.org/search.json?q=${q}&offset=${offset}`
+    );
+    return res.json();
   }
 
   render() {
