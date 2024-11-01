@@ -29,6 +29,7 @@
     "@rollup/plugin-node-resolve": "^15.3.0",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
+    "live-server": "^1.2.2",
     "rollup": "^4.24.0",
     "rollup-plugin-import-css": "^3.5.6"
   },
