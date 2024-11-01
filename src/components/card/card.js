@@ -13,15 +13,20 @@ export class Card extends DivComponent {
     const existInFavorites = this.appState.favorites.find(
       (book) => book.key == this.cardState.key
     );
+    let cover = `<img
+          src="/static/cover.png"
+          alt="Обложка"
+        />`;
+    if (this.cardState.cover_edition_key) {
+      cover = `<img
+          src="https://covers.openlibrary.org/b/olid/${this.cardState.cover_edition_key}-M.jpg"
+          alt="Обложка"
+        />`;
+    }
     this.el.innerHTML = `
     <div class="card">
       <div class="card__image">
-        <img
-          src="https://covers.openlibrary.org/b/olid/${
-            this.cardState.cover_edition_key
-          }-M.jpg"
-          alt="Обложка"
-        />
+        ${cover}
       </div>
       <div class="card__content">
         <span class="card__content-genre">${
@@ -29,14 +34,18 @@ export class Card extends DivComponent {
         }</span>
         <h3 class="card__content-title">${this.cardState.title}</h3>
         <h4 class="card__content-author">${
-          this.cardState.author_name ? this.cardState.author_name.join(", ") : "Не задано"
+          this.cardState.author_name
+            ? this.cardState.author_name.join(", ")
+            : "Не задано"
         }</h4>
         <div class="card__footer">
           <button class="card__button-favorite ${
             existInFavorites ? "button__active" : ""
           }" aria-label="В избранное">
             <img src="${
-              existInFavorites ? "static/favorites.svg" : "static/favorite-white.svg"
+              existInFavorites
+                ? "static/favorites.svg"
+                : "static/favorite-white.svg"
             }" alt="Иконка избранного" />
           </button>
         </div>
