@@ -16,6 +16,9 @@
   gap: 10px;
   color: var(--black);
 }
+.pagination__button:disabled{
+  opacity: 0.5;
+}
 
 #pagination-next::after {
   content: "";
@@ -25,7 +28,7 @@
   background: url(/static/arrow_back.svg);
 }
 
-#pagination-before::before {
+#pagination-previous::before {
   content: "";
   display: block;
   width: 20px;
