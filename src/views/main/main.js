@@ -3,6 +3,7 @@ import onChange from "on-change";
 import { Header } from "../../components/header/header";
 import { Search } from "../../components/search/search";
 import { CardList } from "../../components/card-list/card-list";
+import { Pagination } from "../../components/pagination/pagination";
 
 export class MainView extends AbtractView {
   state = {
@@ -10,7 +11,8 @@ export class MainView extends AbtractView {
     numFound: 0,
     loading: false,
     searchQuery: undefined,
-    offset: 0,
+    page: 1,
+    limit: 9,
   };
   constructor(appState) {
     super();
@@ -31,24 +33,21 @@ export class MainView extends AbtractView {
     }
   }
   async stateHook(path) {
-    if (path === "searchQuery") {
+    if (path === "searchQuery" || path === "page") {
       this.state.loading = true;
-      const data = await this.loadList(this.state.searchQuery, this.state.offset);
+      const data = await this.loadList(this.state.searchQuery, this.state.page);
       this.state.numFound = data.numFound;
       this.state.loading = false;
       this.state.list = data.docs;
     }
-    if (path === "list") {
-      this.render();
-    }
-    if (path === "loading") {
+    if (path === "list" || path === "loading") {
       this.render();
     }
   }
 
-  async loadList(q, offset) {
+  async loadList(q, page) {
     const res = await fetch(
-      `https://openlibrary.org/search.json?q=${q}&offset=${offset}`
+      `https://openlibrary.org/search.json?q=${q}&page=${page}&limit=${this.state.limit}`
     );
     return res.json();
   }
@@ -62,6 +61,10 @@ export class MainView extends AbtractView {
     `;
     main.append(new Search(this.state).render());
     main.append(new CardList(this.appState, this.state).render());
+    if (this.state.list.length > 0) {
+      main.append(new Pagination(this.state).render());
+    }
+
     this.app.innerHTML = "";
     this.app.append(main);
     this.renderHeader();
